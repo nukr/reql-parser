@@ -1,5 +1,4 @@
 import protodef from './reverse-protodef';
-import {reql, simple, real} from './fixtures';
 
 class BinaryTree {
   constructor (value, left, right) {
@@ -25,10 +24,8 @@ class BinaryTree {
       }
     }
   }
-
 }
 
-let counter = 0;
 let createBinaryTreeFromArray = (arr) => {
   let left = null, right = null, thisValue = null;
 
@@ -63,8 +60,4 @@ let createBinaryTreeFromArray = (arr) => {
   return new BinaryTree(arr[0], left, right);
 };
 
-let tree = createBinaryTreeFromArray(real);
-console.log('******* traversal postorder start *******')
-tree.postorder(console.log);
-console.log('******* traversal postorder done *******')
-console.log(tree);
+export { createBinaryTreeFromArray }

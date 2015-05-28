@@ -1,11 +1,11 @@
 var gulp = require('gulp');
 var nodemon = require('gulp-nodemon');
 
-gulp.task('default', ['nodemon']);
+gulp.task('default', ['watch', 'test']);
 
 gulp.task('nodemon', function () {
   nodemon({
-    script: 'parser.js',
+    script: 'src/parser.js',
     ext: 'js',
     execMap: {
       js: 'babel-node --stage-0 --optional=runtime'
