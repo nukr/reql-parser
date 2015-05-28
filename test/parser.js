@@ -9,5 +9,9 @@ describe('building tree from array', () => {
     let tree = createBinaryTreeFromArray(reql);
     tree.should.be.instanceof(BinaryTree);
   });
-  let a = createBinaryTreeFromArray(reql);
+  let expected = JSON.stringify({"value":"FILTER","left":{"value":"TABLE","left":{"value":"DB","left":{"value":"blog"},"right":{}},"right":{"value":"users"}},"right":{"value":{"name":"Michel"}}})
+  let result = JSON.stringify(createBinaryTreeFromArray(reql));
+  it('equal object', () => {
+    result.should.be.deep.equal(expected);
+  })
 })

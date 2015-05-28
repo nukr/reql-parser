@@ -13,7 +13,9 @@
     "url": "https://github.com/nukr/reql-parser/issues"
   },
   "homepage": "https://github.com/nukr/reql-parser#readme",
-  "dependencies": {},
+  "dependencies": {
+    "lodash": "^3.9.3"
+  },
   "devDependencies": {
     "babel": "^5.4.7",
     "babel-runtime": "^5.4.7",
