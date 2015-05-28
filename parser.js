@@ -26,14 +26,6 @@ class BinaryTree {
     }
   }
 
-  // walk (func, order) {
-  //   for (let i of order)
-  //     switch (order[i]) {
-  //       case 'this': func(this.value); break;
-  //       case 'left': if (this.left) this.left.walk(func, order); break;
-  //       case 'right': if (this.right) this.right.walk(func, order); break;
-  //     }
-  // }
 }
 
 let counter = 0;
@@ -47,18 +39,24 @@ let createBinaryTreeFromArray = (arr) => {
   }
 
   if (Array.isArray(arr[1])) {
-    if (Array.isArray(arr[1][0])) {
-      left = createBinaryTreeFromArray(arr[1][0])
+    let nextLeft = arr[1][0]
+    let nextRight = arr[1][1]
+    if (Array.isArray(nextLeft)) {
+      left = createBinaryTreeFromArray(nextLeft)
     } else {
-      if (Number.isInteger(arr[1][0])) arr[1][0] = protodef.Term.TermType[arr[1][0]]
-      left = new BinaryTree(arr[1][0])
+      if (Number.isInteger(nextLeft)) {
+        nextLeft = protodef.Term.TermType[nextLeft]
+      }
+      left = new BinaryTree(nextLeft)
     }
 
-    if (Array.isArray(arr[1][1])) {
-      right = createBinaryTreeFromArray(arr[1][1])
+    if (Array.isArray(nextRight)) {
+      right = createBinaryTreeFromArray(nextRight)
     } else {
-      if (Number.isInteger(arr[1][1])) arr[1][1] = protodef.Term.TermType[arr[1][1]]
-      right = new BinaryTree(arr[1][1]);
+      if (Number.isInteger(nextRight)) {
+        nextRight = protodef.Term.TermType[nextRight]
+      }
+      right = new BinaryTree(nextRight);
     }
   }
 
