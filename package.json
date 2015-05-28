@@ -32,6 +32,6 @@
     "coverage": "babel-node --stage=0 --optional=runtime node_modules/.bin/isparta cover --report text --report html node_modules/.bin/_mocha -- --reporter spec",
     "test:watch": "npm run test -- -w",
     "test": "mocha --compilers js:babel/register",
-    "start": "parallelshell 'npm run nodemon' 'npm run test:watch'"
+    "start": "npm run test:watch"
   }
 }
