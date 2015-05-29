@@ -14,7 +14,8 @@
   },
   "homepage": "https://github.com/nukr/reql-parser#readme",
   "dependencies": {
-    "lodash": "^3.9.3"
+    "lodash": "^3.9.3",
+    "require-dir": "^0.3.0"
   },
   "devDependencies": {
     "babel": "^5.4.7",

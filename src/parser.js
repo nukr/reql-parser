@@ -1,38 +1,35 @@
-import protodef from './reverse-protodef';
-import BinaryTree from './BinaryTree';
+import BinaryTree from './BinaryTree'
+
+let isArray = Array.isArray
+let parser = {}
+
+/**
+ *
+ *
+ */
 
 let createBinaryTreeFromArray = (arr) => {
-  let left = null, right = null, thisValue = null;
+  let left = null, right = null, thisValue = null
 
-  if (Array.isArray(arr[0])) {
-    createBinaryTreeFromArray(arr[0]);
-  } else {
-    arr[0] = protodef.Term.TermType[arr[0]]
+  if (isArray(arr[0])) {
+    left = createBinaryTreeFromArray(arr[0])
   }
 
-  if (Array.isArray(arr[1])) {
-    let nextLeft = arr[1][0]
-    let nextRight = arr[1][1]
-    if (Array.isArray(nextLeft)) {
-      left = createBinaryTreeFromArray(nextLeft)
-    } else {
-      if (Number.isInteger(nextLeft)) {
-        nextLeft = protodef.Term.TermType[nextLeft]
-      }
-      left = new BinaryTree(nextLeft)
-    }
-
-    if (Array.isArray(nextRight)) {
-      right = createBinaryTreeFromArray(nextRight)
-    } else {
-      if (Number.isInteger(nextRight)) {
-        nextRight = protodef.Term.TermType[nextRight]
-      }
-      right = new BinaryTree(nextRight);
-    }
+  // skip MAKE_ARRAY and VAR
+  if (isArray(arr[1]) && arr[0] !== 2 && arr[0] !== 10) {
+    left = arr[1][0] ? createBinaryTreeFromArray(arr[1][0]) : null
+    right = arr[1][1] ? createBinaryTreeFromArray(arr[1][1]) : null
+  } else if (isArray(arr[1])) {
+    left = new BinaryTree(arr[1], null, null)
   }
 
-  return new BinaryTree(arr[0], left, right);
-};
+  thisValue = arr[0]
 
-export {createBinaryTreeFromArray}
+  if (!isArray(arr)) thisValue = arr
+
+  return new BinaryTree(thisValue, left, right)
+}
+
+parser.createBinaryTreeFromArray = createBinaryTreeFromArray
+
+export default parser
