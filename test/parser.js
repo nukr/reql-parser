@@ -1,21 +1,19 @@
 /* global describe, it */
-/* eslint-disable no-unused-vars */
-const should = require('chai').should()
-/* eslint-disable no-unused-vars */
-
+import {expect} from 'chai'
 import fixtures from '../fixtures'
 import BinaryTree from '../src/BinaryTree'
-import parser from '../src/parser.js'
+import parser from '../src/parser'
+import translate from '../src/translate'
 
 describe('building tree from array', () => {
   it('tree should instanceof BinaryTree', () => {
     let tree = parser.createBinaryTreeFromArray(fixtures.reql.simple)
-    tree.should.be.instanceof(BinaryTree)
+    expect(tree).to.be.instanceof(BinaryTree)
   })
 
   it('deep equal', () => {
     let tree = parser.createBinaryTreeFromArray(fixtures.reql.simple)
-    tree.should.be.deep.equal({
+    expect(tree).to.be.deep.equal({
       value: 15,
       left: {value: 14,
         left: {value: 'blog', left: null, right: null},
@@ -27,7 +25,7 @@ describe('building tree from array', () => {
 
   it('MAKE_ARRAY as expected', () => {
     let tree = parser.createBinaryTreeFromArray(fixtures.reql.makeArray)
-    tree.should.be.deep.equal({
+    expect(tree).to.be.deep.equal({
       value: 2,
       left: {value: [10, 20, 30], left: null, right: null},
       right: null
@@ -36,10 +34,44 @@ describe('building tree from array', () => {
 
   it('Array only contain one number', () => {
     let tree = parser.createBinaryTreeFromArray(fixtures.reql.arrayOnlyContainOneNumber)
-    tree.should.be.deep.equal({
+    expect(tree).to.be.deep.equal({
       value: 10,
       left: {value: [1], left: null, right: null},
       right: null
     })
+  })
+
+  it('translate term', () => {
+    expect(translate(1)).to.be.equal('DATUM')
+    expect(translate(14)).to.be.equal('DB')
+    expect(translate(15)).to.be.equal('TABLE')
+    expect(translate(39)).to.be.equal('FILTER')
+    expect(translate(999)).to.be.equal(undefined)
+  })
+
+
+})
+
+describe('walking through the tree', () => {
+  it('postorder', () => {
+    let arr = [];
+    let tree = parser.createBinaryTreeFromArray(fixtures.reql.reql)
+    tree.postorder((value) => {
+      Number.isInteger(value) ? arr.push(translate(value)) : arr.push(value)
+    })
+    expect(arr).to.be.deep.equal(
+      ['blog', 'DB', 'users', 'TABLE', { name: 'Michel'}, 'FILTER']
+    )
+  })
+
+  it('preorder', () => {
+    let arr = [];
+    let tree = parser.createBinaryTreeFromArray(fixtures.reql.reql)
+    tree.preorder((value) => {
+      Number.isInteger(value) ? arr.push(translate(value)) : arr.push(value)
+    })
+    expect(arr).to.be.deep.equal(
+      ['FILTER', 'TABLE', 'DB', 'blog', 'users', { name: 'Michel'}]
+    )
   })
 })
