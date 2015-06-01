@@ -1,4 +1,11 @@
 import BinaryTree from './BinaryTree'
+import translate from './translate'
+import _ from 'lodash'
+import rethinkdbdash from 'rethinkdbdash'
+import co from 'co'
+
+const r = rethinkdbdash()
+
 let parser = {}
 parser.createBinaryTreeFromArray = (arr) => {
   let left = null, right = null, thisValue = null
@@ -18,26 +25,70 @@ parser.createBinaryTreeFromArray = (arr) => {
   return new BinaryTree(thisValue, left, right)
 }
 
-parser.buildReqlFromBTree = (query) => {
-  let command = null, argument = null, option = null
-  query =
-    [ 39,
-      [
-        [ 15, [ [ 14, ['test'] ], 'bills' ] ],
-        [ 69, [ [ 2, [86] ], [ 17, [ [ 170, [ [ 10, [86] ], 'credit' ] ], true ]]]]
-      ]
-    ]
+let isTree = (tree) => {
+  let left = null
+  let right = null
+  let value = null
+  if (typeof tree !== 'undefined' && tree !== null) {
+    let keys = Object.keys(tree)
 
-  // DATUM case
-  if (Array.isArray(query) && query.length === 3) {
-    command = query[0]
-    argument = query[1]
-    option = query[2]
+    keys.forEach((key) => {
+      switch (key) {
+        case 'left':
+          left = true
+          break
+        case 'right':
+          right = true
+          break
+        case 'value':
+          value = true
+          break
+      }
+    })
   }
 
-  // [command + argument]
-  if(Array.isArray(query)) {
+  if (left && right && value) {
+    return true
+  } else {
+    return false
   }
+}
+
+let extractTree = (tree) => {
+  let arr = []
+  if (Array.isArray(tree.value)) {
+    arr.push({array: tree.value})
+  } else {
+    arr.push(tree.value)
+  }
+
+  if (isTree(tree.left) && tree.right !== null) {
+    arr.unshift(extractTree(tree.left))
+  } else if (isTree(tree.left) && tree.right === null) {
+    arr.push(extractTree(tree.left))
+  }
+
+  if (isTree(tree.right)) {
+    arr.push(extractTree(tree.right))
+  }
+  return arr
+}
+
+parser.buildReqlFromBTree = (tree) => {
+
+  let arr = _.flattenDeep(extractTree(tree))
+
+  co(function * () {
+    // let db = r.db('test')
+    let table = r.table('bills')
+    let filter = r.filter({credit: true})
+    console.log(yield filter.run())
+  })
+
+  // co(function * () {
+  //   let result = yield eval('r.db("test").table("bills").limit(5).run()')
+  //   console.log(result)
+  // })
   return 'r.db("blog").table("users")'
 }
 

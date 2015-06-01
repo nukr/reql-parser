@@ -99,8 +99,8 @@ describe('walking through the tree', () => {
 
 describe('build js reql form from BinaryTree', () => {
   it('build simple reql', () => {
-    // let tree = parser.createBinaryTreeFromArray(fixtures.reql.filterWithFunc)
-    // let query = parser.buildReqlFromBTree(fixtures.reql.filterWithFunc)
+    let tree = parser.createBinaryTreeFromArray(fixtures.reql.filterWithFunc)
+    let query = parser.buildReqlFromBTree(tree)
     expect(query).to.be.equal('r.db("blog").table("users")')
   })
 })
