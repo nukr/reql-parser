@@ -11,7 +11,7 @@ describe('building tree from array', () => {
     expect(tree).to.be.instanceof(BinaryTree)
   })
 
-  it('deep equal', () => {
+  it('simple case deep equal', () => {
     let tree = parser.createBinaryTreeFromArray(fixtures.reql.simple)
     expect(tree).to.be.deep.equal({
       value: 15,
@@ -32,7 +32,7 @@ describe('building tree from array', () => {
     })
   })
 
-  it('Array only contain one number', () => {
+  it('VAR as expected', () => {
     let tree = parser.createBinaryTreeFromArray(fixtures.reql.arrayOnlyContainOneNumber)
     expect(tree).to.be.deep.equal({
       value: 10,
@@ -49,12 +49,11 @@ describe('building tree from array', () => {
     expect(translate(999)).to.be.equal(undefined)
   })
 
-
 })
 
 describe('walking through the tree', () => {
   it('postorder', () => {
-    let arr = [];
+    let arr = []
     let tree = parser.createBinaryTreeFromArray(fixtures.reql.reql)
     tree.postorder((value) => {
       Number.isInteger(value) ? arr.push(translate(value)) : arr.push(value)
@@ -65,7 +64,7 @@ describe('walking through the tree', () => {
   })
 
   it('preorder', () => {
-    let arr = [];
+    let arr = []
     let tree = parser.createBinaryTreeFromArray(fixtures.reql.reql)
     tree.preorder((value) => {
       Number.isInteger(value) ? arr.push(translate(value)) : arr.push(value)
@@ -73,5 +72,35 @@ describe('walking through the tree', () => {
     expect(arr).to.be.deep.equal(
       ['FILTER', 'TABLE', 'DB', 'blog', 'users', { name: 'Michel'}]
     )
+  })
+
+  it('inorder', () => {
+    let arr = []
+    let tree = parser.createBinaryTreeFromArray(fixtures.reql.reql)
+    tree.inorder((value) => {
+      Number.isInteger(value) ? arr.push(translate(value)) : arr.push(value)
+    })
+    expect(arr).to.be.deep.equal(
+      ['blog', 'DB', 'TABLE', 'users', 'FILTER', { name: 'Michel'}]
+    )
+  })
+
+  it('levelorder', () => {
+    let arr = []
+    let tree = parser.createBinaryTreeFromArray(fixtures.reql.reql)
+    tree.levelorder((value) => {
+      Number.isInteger(value) ? arr.push(translate(value)) : arr.push(value)
+    })
+    expect(arr).to.be.deep.equal(
+      ['FILTER', 'TABLE', { name: 'Michel'}, 'DB', 'users', 'blog']
+    )
+  })
+})
+
+describe('build js reql form from BinaryTree', () => {
+  it('build simple reql', () => {
+    // let tree = parser.createBinaryTreeFromArray(fixtures.reql.filterWithFunc)
+    // let query = parser.buildReqlFromBTree(fixtures.reql.filterWithFunc)
+    expect(query).to.be.equal('r.db("blog").table("users")')
   })
 })
