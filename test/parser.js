@@ -16,10 +16,10 @@ describe('building tree from array', () => {
     expect(tree).to.be.deep.equal({
       value: 15,
       left: {value: 14,
-        left: {value: 'blog', left: null, right: null},
+        left: {value: 'test', left: null, right: null},
         right: null
       },
-      right: { value: 'users', left: null, right: null}
+      right: { value: 'meals', left: null, right: null}
     })
   })
 
@@ -59,7 +59,7 @@ describe('walking through the tree', () => {
       Number.isInteger(value) ? arr.push(translate(value)) : arr.push(value)
     })
     expect(arr).to.be.deep.equal(
-      ['blog', 'DB', 'users', 'TABLE', { name: 'Michel'}, 'FILTER']
+      ['test', 'DB', 'bills', 'TABLE', { credit: true}, 'FILTER']
     )
   })
 
@@ -70,7 +70,7 @@ describe('walking through the tree', () => {
       Number.isInteger(value) ? arr.push(translate(value)) : arr.push(value)
     })
     expect(arr).to.be.deep.equal(
-      ['FILTER', 'TABLE', 'DB', 'blog', 'users', { name: 'Michel'}]
+      ['FILTER', 'TABLE', 'DB', 'test', 'bills', { credit: true}]
     )
   })
 
@@ -81,7 +81,7 @@ describe('walking through the tree', () => {
       Number.isInteger(value) ? arr.push(translate(value)) : arr.push(value)
     })
     expect(arr).to.be.deep.equal(
-      ['blog', 'DB', 'TABLE', 'users', 'FILTER', { name: 'Michel'}]
+      ['test', 'DB', 'TABLE', 'bills', 'FILTER', { credit: true}]
     )
   })
 
@@ -92,15 +92,7 @@ describe('walking through the tree', () => {
       Number.isInteger(value) ? arr.push(translate(value)) : arr.push(value)
     })
     expect(arr).to.be.deep.equal(
-      ['FILTER', 'TABLE', { name: 'Michel'}, 'DB', 'users', 'blog']
+      ['FILTER', 'TABLE', { credit: true}, 'DB', 'bills', 'test']
     )
-  })
-})
-
-describe('build js reql form from BinaryTree', () => {
-  it('build simple reql', () => {
-    let tree = parser.createBinaryTreeFromArray(fixtures.reql.filterWithFunc)
-    let query = parser.buildReqlFromBTree(tree)
-    expect(query).to.be.equal('r.db("blog").table("users")')
   })
 })

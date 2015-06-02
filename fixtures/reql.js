@@ -1,7 +1,7 @@
 export default {
-  reql: [ 39, [ [ 15, [ [ 14, ['blog'] ], 'users' ] ], {'name': 'Michel'} ] ],
+  reql: [ 39, [ [ 15, [ [ 14, ['test'] ], 'bills' ] ], {'credit': true} ] ],
 
-  simple: [ 15, [ [ 14, ['blog'] ], 'users' ] ],
+  simple: [ 15, [ [ 14, ['test'] ], 'meals' ] ],
 
   func: [69, [[2, [1, 2, 3]], [24, [[10, [1]], [10, [2]], [10, [3]]]]]],
 
