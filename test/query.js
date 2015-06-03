@@ -59,4 +59,12 @@ describe('build query from array', () => {
       expect(result).to.be.equal(35177)
     })
   })
+
+  it('withFields', () => {
+    let query = new Query(r.db('test').table('bills').withFields('billNo', 'creator').limit(1).build())
+    let promise = query.run()
+    promise.then(result => {
+      expect(Object.keys(result[0])).to.be.deep.equal(['billNo', 'creator'])
+    })
+  })
 })

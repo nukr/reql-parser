@@ -51,6 +51,10 @@ class Query {
         return this.map(term[1])
       case termTypes.ADD: // 24
         return this.add(term[1])
+      case termTypes.LIMIT: // 71
+        return this.limit(term[1])
+      case termTypes.WITH_FIELDS: // 96
+        return this.withFields(term[1])
       default:
         throw new Error.ReqlRuntimeError("Unknown term")
     }
@@ -139,6 +143,16 @@ class Query {
   varId (args) {
     log(`${args}`)
     return this[`var_${args}`]
+  }
+
+  limit (args) {
+    let sequence = this.evaluate(args[0])
+    return sequence.limit(args[1])
+  }
+
+  withFields (args) {
+    let sequence = this.evaluate(args.shift())
+    return sequence.withFields(...args)
   }
 
 }
