@@ -8,12 +8,24 @@ describe('build query from array', () => {
     let query = new Query(r.db('test').table('bills').build())
     let promise = query.run()
     promise.then((result) => {
-      expect(result.length).to.be.equal(5)
+      expect(result.length).to.be.equal(35177)
     })
   })
 
   it("filter with objet", () => {
     let query = new Query(r.db('test').table('bills').filter({billNo: 13799}).build())
+    let promise = query.run()
+    promise.then((result) => {
+      expect(result[0].id).to.be.equal('0006e572-2f24-4d79-87c3-ea6213caba06')
+    })
+  })
+
+  it("filter with function", () => {
+    let query = new Query(
+      r.db('test').table('bills').filter((bill) => {
+        return bill('id').eq('0006e572-2f24-4d79-87c3-ea6213caba06')
+      }).build()
+    )
     let promise = query.run()
     promise.then((result) => {
       expect(result[0].id).to.be.equal('0006e572-2f24-4d79-87c3-ea6213caba06')
@@ -42,7 +54,9 @@ describe('build query from array', () => {
         return left.add(right)
       }).build()
     )
-    query.run()
-    expect(result).to.be.equal(35177)
+    let promise = query.run()
+    promise.then(result => {
+      expect(result).to.be.equal(35177)
+    })
   })
 })

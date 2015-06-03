@@ -1,5 +1,8 @@
 import rethinkdbdash from 'rethinkdbdash'
 import protodef from './protodef'
+import debug from 'debug'
+
+let log = debug('query')
 
 let termTypes = protodef.Term.TermType
 let r = rethinkdbdash({
@@ -15,11 +18,14 @@ class Query {
   run (query) {
     query = query || this.query
     let result = this.evaluate(query)
-    return result.limit(5).run()
+    log('result', result)
+    return result.run()
   }
 
   evaluate (term, internalOptions) {
     internalOptions = internalOptions || {}
+
+    if(!Array.isArray(term)) return term
 
     let termType = term[0]
     switch (termType) {
@@ -43,17 +49,23 @@ class Query {
         return this.reduce(term[1])
       case termTypes.MAP: // 38
         return this.map(term[1])
+      case termTypes.ADD: // 24
+        return this.add(term[1])
+      default:
+        throw new Error.ReqlRuntimeError("Unknown term")
     }
   }
 
   db (args) {
     let dbName = args[0]
+    log('db')
     return r.db(dbName)
   }
 
   table (args) {
     let db = this.evaluate(args[0])
     let tableName = args[1]
+    log('table')
     return db.table(tableName)
   }
 
@@ -65,45 +77,68 @@ class Query {
     } else {
       predicate = args[1]
     }
+    log('filter')
     return sequence.filter(predicate)
   }
 
   reduce (args) {
-    console.log(JSON.stringify(args, null, 2))
+    let sequence = this.evaluate(args[0])
+    let predicate = this.evaluate(args[1])
+    log('reduce()')
+    return sequence.reduce(predicate)
   }
 
   map (args) {
-    console.log(args)
+    let sequence = this.evaluate(args[0])
+    let predicate = this.evaluate(args[1])
+    log('map()')
+    return sequence.map(predicate)
+  }
+
+  add (args) {
+    let var1 = this.evaluate(args[0])
+    let var2 = this.evaluate(args[1])
+    log('add()', var1, var2)
+    return var1.add(var2);
   }
 
   func (args) {
     this.fnArgs = this.evaluate(args[0])
     this.funcBody = args[1]
+    let vars = ''
+    this.fnArgs.forEach(arg => {
+      vars = vars + `this.${arg} = ${arg};`
+    })
+    log('func', vars)
     return new Function(
       this.fnArgs.join(','),
       `
-        this.runtimeVar = ${this.fnArgs};
+        ${vars};
         return this.evaluate(this.funcBody);
       `
     ).bind(this)
   }
 
   makeArray (args) {
+    log(`makeArray ${args}`)
     return args.map((arg) => `var_${arg}`)
   }
 
   eq (args) {
     let sequence = this.evaluate(args[0])
+    log(`.eq(${args[1]})`)
     return sequence.eq(args[1])
   }
 
   bracket (args) {
     let sequence = this.evaluate(args[0])
+    log(`.(${args[1]})`)
     return sequence(args[1])
   }
 
   varId (args) {
-    return this.runtimeVar
+    log(`${args}`)
+    return this[`var_${args}`]
   }
 
 }
