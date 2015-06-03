@@ -2,7 +2,10 @@ import rethinkdbdash from 'rethinkdbdash'
 import protodef from './protodef'
 
 let termTypes = protodef.Term.TermType
-let r = rethinkdbdash()
+let r = rethinkdbdash({
+  host: '192.168.100.5',
+  port: 28015
+})
 
 class Query {
   constructor (query) {
@@ -36,7 +39,10 @@ class Query {
         return this.eq(term[1])
       case termTypes.BRACKET: // 170
         return this.bracket(term[1])
-      default:
+      case termTypes.REDUCE: // 37
+        return this.reduce(term[1])
+      case termTypes.MAP: // 38
+        return this.map(term[1])
     }
   }
 
@@ -62,20 +68,28 @@ class Query {
     return sequence.filter(predicate)
   }
 
+  reduce (args) {
+    console.log(JSON.stringify(args, null, 2))
+  }
+
+  map (args) {
+    console.log(args)
+  }
+
   func (args) {
     this.fnArgs = this.evaluate(args[0])
     this.funcBody = args[1]
     return new Function(
       this.fnArgs.join(','),
       `
-        this.runtimeVar = ${this.fnArgs[0]};
+        this.runtimeVar = ${this.fnArgs};
         return this.evaluate(this.funcBody);
       `
     ).bind(this)
   }
 
   makeArray (args) {
-    return args.map((arg) => `var${arg}`)
+    return args.map((arg) => `var_${arg}`)
   }
 
   eq (args) {
@@ -91,6 +105,7 @@ class Query {
   varId (args) {
     return this.runtimeVar
   }
+
 }
 
 export default Query

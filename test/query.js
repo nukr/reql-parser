@@ -1,29 +1,48 @@
 /* global describe, it */
 import {expect} from 'chai'
 import Query from '../src/query'
+import r from 'rethinkdb'
 
 describe('build query from array', () => {
   it("simple query r.db('test').table('bills')", () => {
-    let query = new Query([15, [ [14, ['test']], 'bills' ] ])
+    let query = new Query(r.db('test').table('bills').build())
     let promise = query.run()
     promise.then((result) => {
       expect(result.length).to.be.equal(5)
     })
   })
 
-  it("r.db('test').table('bills').filter({billNo: 13799})", () => {
-    let query = new Query([39, [[15, [[14, ['test']], 'bills']], {billNo: 13799}]])
+  it("filter with objet", () => {
+    let query = new Query(r.db('test').table('bills').filter({billNo: 13799}).build())
     let promise = query.run()
     promise.then((result) => {
       expect(result[0].id).to.be.equal('0006e572-2f24-4d79-87c3-ea6213caba06')
     })
   })
 
-  it("r.db('test').table('bills').filter((b) => {b('id').eq('0006e572-2f24-4d79-87c3-ea6213caba06')})", () => {
-    let query = new Query([ 39, [ [ 15, [ [ 14, ['test'] ], 'bills' ] ], [ 69, [ [ 2, [86] ], [ 17, [ [ 170, [ [ 10, [86] ], 'id' ] ], '0006e572-2f24-4d79-87c3-ea6213caba06']]]]]])
+  it("filter with function", () => {
+    let query = new Query(
+      r.db('test').table('bills').filter((bill) => {
+        return bill('id').eq('0006e572-2f24-4d79-87c3-ea6213caba06')
+      }).build()
+    )
     let promise = query.run()
     promise.then((result) => {
       expect(result[0].id).to.be.equal('0006e572-2f24-4d79-87c3-ea6213caba06')
     })
+  })
+
+  it('map reduce add', () => {
+    let query = new Query(
+      r.db('test').table('bills')
+      .map(function(bill){
+        return 1
+      })
+      .reduce(function (left, right){
+        return left.add(right)
+      }).build()
+    )
+    query.run()
+    expect(result).to.be.equal(35177)
   })
 })
